@@ -43,19 +43,18 @@ hpcDateTime <- paste(hpcPlottingData$Date, hpcPlottingData$Time)
 hpcPlottingDateTime <- strptime(hpcDateTime, "%d/%m/%Y %H:%M:%S")
 
 # Plot Global Active Power for 2 selected days
-library(ggplot2)
-library(scales)
-ggplot(hpcPlottingData, aes(hpcPlottingDateTime, Global_active_power)) + 
-    geom_line() +
-    theme_bw() + 
-    theme(panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank(), 
-          axis.line = element_line(colour = "black")) +
-    scale_x_datetime(breaks = date_breaks("1 days"),
-                     labels = date_format("%a")) + 
-    xlab("") + ylab("Global Active Power (kilowatts)")
+par(mfrow = c(1, 1), mar = c(3, 4, 2, 2))
+
+with(hpcPlottingData, 
+     plot(hpcPlottingDateTime, 
+          Global_active_power,
+          type = "l",
+          xlab = "",
+          ylab = "Global Active Power (kilowatts)"))
 
 # Copy plot to a PNG file
 dev.copy(png, file = "plot2.png") 
 # Close png device
 dev.off() 
+
+

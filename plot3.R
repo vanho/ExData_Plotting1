@@ -1,5 +1,5 @@
 ###################################################
-## Exploratory Data Analysis Project 1 - plot2.R ##
+## Exploratory Data Analysis Project 1 - plot3.R ##
 ## author: Van Hai Ho                            ##
 ###################################################
 
@@ -41,40 +41,46 @@ hpcPlottingData <- subset(hpcData, as.Date(Date, "%d/%m/%Y") >= startDate & as.D
 # Read in date/time info in format 'dd/mm/YYYY H:M:S'
 hpcDateTime <- paste(hpcPlottingData$Date, hpcPlottingData$Time)
 hpcPlottingDateTime <- strptime(hpcDateTime, "%d/%m/%Y %H:%M:%S")
-
-# Plot Energy sub metering 2 selected days
-library(reshape2)
-library(ggplot2)
-library(scales)
-library(grid)
+hpcPlottingData <- cbind(hpcPlottingData, hpcPlottingDateTime)
 
 # melt data in order to plot all three sub metering in the same plot
+library(reshape2)
 hpcSubMeterMelt <- melt(hpcPlottingData, 
-                        id.vars = c("Date", "Time"),
-                        measure.vars = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
+                        id.vars = c("hpcPlottingDateTime"),
+                        measure.vars = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"),
+                        value.name = "Sub_metering",
+                        na.rm = TRUE)
 
-# Read in date/time info in format 'dd/mm/YYYY H:M:S'
-hpcDateTime <- paste(hpcSubMeterMelt$Date, hpcSubMeterMelt$Time)
-hpcPlottingDateTime <- strptime(hpcDateTime, "%d/%m/%Y %H:%M:%S")
+# Plot Energy sub metering 1, 2, 3
+par(mar = c(2, 4, 2, 2))
+with(hpcSubMeterMelt, 
+     plot(hpcPlottingDateTime, 
+          Sub_metering, 
+          type = "n",
+          xlab = "",
+          ylab = "Energy sub metering"))
+with(subset(hpcSubMeterMelt, variable == "Sub_metering_1"), 
+     lines(hpcPlottingDateTime, 
+           Sub_metering, 
+           type = "l",
+           col = "black"))
+with(subset(hpcSubMeterMelt, variable == "Sub_metering_2"), 
+     lines(hpcPlottingDateTime, 
+           Sub_metering, 
+           type = "l",
+           col = "red"))
+with(subset(hpcSubMeterMelt, variable == "Sub_metering_3"), 
+     lines(hpcPlottingDateTime, 
+           Sub_metering, 
+           type = "l",
+           col = "blue"))
 
-hpcSubMeteringPlot <- ggplot(hpcSubMeterMelt)
-hpcSubMeteringPlot + 
-    geom_line(aes(x = hpcPlottingDateTime, y = value, colour = variable)) +
-    theme_bw() + 
-    theme(panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank(), 
-          axis.line = element_line(colour = "black"),
-          legend.background = element_rect(colour = "black"),
-          legend.margin = unit(0, "lines"),
-          legend.key = element_blank(),
-          legend.justification = c(1, 1),
-          legend.position = c(1, 1),
-          legend.box.just = c(1, 1),
-          legend.title = element_blank()) +
-    scale_colour_manual(values = c("black", "red", "blue")) +
-    scale_x_datetime(breaks = date_breaks("1 days"),
-                     labels = date_format("%a")) + 
-    xlab("") + ylab("Energy sub metering")
+legend("topright", 
+       col = c("black", "red", "blue"),
+       legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), 
+       lwd = 1, lty = c(1, 1, 1), 
+       pch = c(NA, NA, NA), 
+       xjust = 1, yjust = 0.5)
 
 # Copy plot to a PNG file
 dev.copy(png, file = "plot3.png") 
