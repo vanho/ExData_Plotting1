@@ -98,6 +98,7 @@ legend("topright",
        legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), 
        lwd = 1, lty = c(1, 1, 1), 
        pch = c(NA, NA, NA), 
+       bty = "n",
        xjust = 0.5, yjust = 0.5,
        cex = 0.6)
 
